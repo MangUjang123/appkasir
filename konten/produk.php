@@ -31,6 +31,7 @@
             <table  id="example1" class="table table-hover">
                 <thead class="bg-blue">
                     <th>Produk ID</th>
+                    <th>Barcode</th>
                     <th>Nama Produk</th>
                     <th>Harga</th>
                     <th>Stok</th>
@@ -44,8 +45,9 @@
 
                     <tr>
                         <td><?= $kolom['ProdukID']; ?></td>
+                        <td><?= $kolom['Barcode']; ?></td>
                         <td><?= $kolom['NamaProduk']; ?></td>
-                        <td><?= $kolom['Harga']; ?></td>
+                        <td><?= number_format($kolom['Harga']) ; ?></td>
                         <td><?= $kolom['Stok']; ?></td>
                         <td>
                           <a href="aksi/produk.php" data-toggle="modal" data-target="#modalubah<?= $kolom['ProdukID']; ?>"><i class="fas fa-edit"></i>
@@ -70,11 +72,14 @@
             <input type="hidden" name="aksi" value="ubah">
             <input type="hidden" name="produkID" value="<?=$kolom['ProdukID']; ?>">
 
+            <label for="nama">Barcode</label>
+            <input type="text" name="barcode" value="<?=$kolom['Barcode']; ?>" class="form-control" required>
+            <br>
             <label for="nama">Nama Produk</label>
             <input type="text" name="namaproduk" value="<?=$kolom['NamaProduk']; ?>" class="form-control" required>
             <br>
             <label for="harga">Harga</label>
-            <input type="number" name="harga" value="<?=$kolom['Harga']; ?>" class="form-control" required>
+            <input type="number" name="harga" value="<?= number_format($kolom['Harga']) ; ?>" class="form-control" required>
             <br>
             <br>
             <label for="stok">Stok</label>
@@ -118,6 +123,9 @@
       <div class="modal-body">
         <form action="aksi/produk.php" method="post">
             <input type="hidden" name="aksi" value="tambah">
+            <label for="barcode">Barcode</label>
+            <input type="text" name="barcode" class="form-control" required>
+            <br>
             <label for="nama">Nama Produk</label>
             <input type="text" name="namaproduk" class="form-control" required>
             <br>
