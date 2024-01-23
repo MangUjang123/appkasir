@@ -101,7 +101,7 @@
             <button class="btn btn-block bg-purple mt-3"
             data-toggle="modal"
             data-target="#simpanJual"><i class="fas
-            fa-save"></i>Simpan Penjualan</button>
+            fa-save"></i> Simpan Penjualan</button>
         </div>
     </div>
        
@@ -268,7 +268,7 @@
           $total_belanja; ?>" readonly>
 
         <button class="btn btn-info mt-3 btn-block"
-        type="submit"><i class="fas fa-save">Simpan Penjualan</i></button>
+        type="submit"><i class="fas fa-save"> Simpan Penjualan</i></button>
         </form>
       </div>
       <div class="modal-footer">
