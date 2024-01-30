@@ -33,17 +33,17 @@ include "../../koneksi.php";
 require_once('tcpdf_include.php');
 
 // create new PDF document
-$pdf = new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+$pdf = new TCPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 // set document information
 $pdf->setCreator(PDF_CREATOR);
 $pdf->setAuthor('Williams Felanuel');
-$pdf->setTitle('Laporan Pembayaran Siswa');
-$pdf->setSubject('Pembayaran Siswa');
-$pdf->setKeywords('SIP,Pembayaran Siswa');
+$pdf->setTitle('Laporan Penjualan');
+$pdf->setSubject('Penjualan');
+$pdf->setKeywords('APP Kasir, Penjualan');
 
 // set default header data
-$pdf->setHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH,'SIP 1.0', PDF_HEADER_STRING);
+$pdf->setHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH,'APP Kasir', PDF_HEADER_STRING);
 
 // set header and footer fonts
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -82,59 +82,53 @@ $pdf->AddPage();
 
 $tanggal_awal=$_GET['tanggal_awal'];
 $tanggal_akhir=$_GET['tanggal_akhir'];
-$id_siswa=$_GET['id_siswa'];
+
 // create some HTML content
 $html = '
-<p align="center"><strong><bold>Laporan Pembayaran Siswa</strong></b></p><br>
-<b>Periode : '.date('d-F-Y',strtotime($tanggal_awal)). ' S/D '. date('d-F-Y',strtotime($tanggal_akhir)).'</b><br><br>
-
-<table style="width:100% border-collapse:collaps;border:1px solid black;" border="1">
-  <tr style="font-weight:bold; text-align:center;">
-    <td style="width:5%;">No</td>
-    <td style="width:5%;">NIS</td>
-    <td style="width:25%;">Nama KE</td>
-    <td style="width:15%;">Kelas</td>
-    <td style="width:15%;">Tanggal Pembayaran</td>
-    <td style="width:15%;">Status</td>
-    <td style="width:20%;">Nominal Pembayaran</td>
-  </tr>
+<p align="center"><strong><bold>Laporan Penjualan</strong></b></p><br>
+<b>Periode : '.date('d-F-Y',strtotime($tanggal_awal)). ' S/D '. date('d-F-Y',strtotime($tanggal_akhir)) .'</b>
+<br><br>
+<table style="width:100%; border-collapse:collapse; border: 1px solid black;" border="1">
+    <tr style="font-weight:bold; text-align:center;">
+        <td style="width:5%;">No</td>
+        <td style="width:20%;">Penjualan ID</td>
+        <td style="width:20%;">Tanggal Penjualan</td>
+        <td style="width:35%;">Nama Pelanggan</td>
+        <td style="width:20%;">Total Belanja</td>
+    </tr>
 
 ';
 
-$sql="SELECT bayar.*,siswa.nis,siswa.nama,siswa.kelas,bayar_metode.metode FROM bayar,siswa,bayar_metode WHERE bayar.dihapus_pada IS NULL AND bayar.id_siswa=siswa.id_siswa AND bayar.id_bayar_metode=bayar_metode.id_bayar_metode AND bayar.tanggal_bayar BETWEEN '$tanggal_awal' AND '$tanggal_akhir' AND bayar.id_siswa=$id_siswa ORDER BY bayar.tanggal_bayar ASC";
+$sql="SELECT penjualan.*,pelanggan.NamaPelanggan FROM penjualan,pelanggan WHERE penjualan.PelangganID=pelanggan.PelangganID AND TanggalPenjualan BETWEEN '$tanggal_awal' AND '$tanggal_akhir' ORDER BY penjualan.TanggalPenjualan ASC";
 $query=mysqli_query($koneksi,$sql);
 $no=0;
 $total=0;
-while($bayar=mysqli_fetch_array($query)){
-  $no++;
-  $total=$total+$bayar['nominal_bayar'];
-  $html.='
-  <tr>
-  <td>'.$no.'</td>
-  <td>'.$bayar['nis'].'</td>
-  <td>'.$bayar['nama'].'</td>
-  <td>'.$bayar['kelas'].'</td>
-  <td>'.$bayar['tanggal_bayar'].'</td>
-  <td>'.$bayar['status_verifikasi'].'</td>
-  <td align="right";>'.number_format($bayar['nominal_bayar']).'</td>
-</tr>
-  ';
+while($data=mysqli_fetch_array($query)){
+    $no++;
+    $total=$total+$data['TotalHarga'];
+    $html.='
+    <tr>
+        <td>'.$no.'</td>
+        <td>'.$data['PenjualanID'].'</td>
+        <td>'.$data['TanggalPenjualan'].'</td>
+        <td>'.$data['NamaPelanggan'].'</td>
+        <td align="right">'.number_format($data['TotalHarga']).'</td>
+    </tr>
+    ';
 }
+
 $html.='
-<tr>
-  <td colspan="6" align="center"><b>Grantotal</b></td>
-  <td align="right"><b>'.number_format($total).'</b></td>
-</tr>
 </table>
 <br><br>
--- Dicetak Pada : '.date("d-F-Y H:i:s").' --
+-- Dicetak Pada : '.date('d-F-Y H:i:s').' --
+
 ';
 
 // output the HTML content
 $pdf->writeHTML($html, true, false, true, false, '');
 
 //Close and output PDF document
-$pdf->Output('laporan_pembayaran_siswa.pdf', 'I');
+$pdf->Output('laporan_peserta_didik.pdf', 'I');
 
 //============================================================+
 // END OF FILE

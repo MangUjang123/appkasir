@@ -35,6 +35,10 @@ else if($_GET['p']=='backup'){
     $title="Backup Sistem";
     $konten="konten/backup.php";
 }
+else if($_GET['p']=='restore'){
+    $title="Restore Sistem";
+    $konten="konten/restore.php";
+}
 else {
     $title="Halaman Tidak Ditemukan";
     $konten="konten/404.php";

@@ -38,12 +38,12 @@ $pdf = new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 // set document information
 $pdf->setCreator(PDF_CREATOR);
 $pdf->setAuthor('Williams Felanuel');
-$pdf->setTitle('Laporan Pembayaran Siswa');
-$pdf->setSubject('Pembayaran Siswa');
-$pdf->setKeywords('SIP,Pembayaran Siswa');
+$pdf->setTitle('Laporan Penjualan Per-Produk');
+$pdf->setSubject('Penjualan Per-Produk');
+$pdf->setKeywords('APP Kasir,Penjualan Per-Produk');
 
 // set default header data
-$pdf->setHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH,'SIP 1.0', PDF_HEADER_STRING);
+$pdf->setHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, 'APP Kasir', PDF_HEADER_STRING);
 
 // set header and footer fonts
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -64,10 +64,10 @@ $pdf->setAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
 // set some language-dependent strings (optional)
-if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
-	require_once(dirname(__FILE__).'/lang/eng.php');
-	$pdf->setLanguageArray($l);
-}
+// if (@file_exists(dirname(FILE).'/lang/eng.php')) {
+// 	require_once(dirname(FILE).'/lang/eng.php');
+// 	$pdf->setLanguageArray($l);
+// }
 
 // ---------------------------------------------------------
 
@@ -82,59 +82,66 @@ $pdf->AddPage();
 
 $tanggal_awal=$_GET['tanggal_awal'];
 $tanggal_akhir=$_GET['tanggal_akhir'];
-$id_siswa=$_GET['id_siswa'];
+$ProdukID=$_GET['ProdukID'];
+$sql_produk="SELECT * FROM produk WHERE ProdukID=$ProdukID";
+$query_produk=mysqli_query($koneksi,$sql_produk);
+$produk=mysqli_fetch_array($query_produk);
+
+
 // create some HTML content
 $html = '
-<p align="center"><strong><bold>Laporan Pembayaran Siswa</strong></b></p><br>
-<b>Periode : '.date('d-F-Y',strtotime($tanggal_awal)). ' S/D '. date('d-F-Y',strtotime($tanggal_akhir)).'</b><br><br>
-
-<table style="width:100% border-collapse:collaps;border:1px solid black;" border="1">
-  <tr style="font-weight:bold; text-align:center;">
-    <td style="width:5%;">No</td>
-    <td style="width:5%;">NIS</td>
-    <td style="width:25%;">Nama KE</td>
-    <td style="width:15%;">Kelas</td>
-    <td style="width:15%;">Tanggal Pembayaran</td>
-    <td style="width:15%;">Status</td>
-    <td style="width:20%;">Nominal Pembayaran</td>
-  </tr>
+<p align="center"><strong><bold>Laporan Penjualan Per Produk</strong></b></p><br>
+<b>Produk : '.$produk['NamaProduk'].' </b> <br>
+<b>Periode : '.date('d-F-Y',strtotime($tanggal_awal)). ' S/D ' .date('d-F-Y',strtotime($tanggal_akhir)).'</b>
+<br> <br>
+<table style="widht:100%; border-collapse:collapse; border: 1px solid black;" border="1">
+<tr style="font-weight:bold; text-align:center;">
+<td style="width:5%">No</td>
+<td style="width:10%">No Jual</td>
+<td style="width:25%">Tanggal</td>
+<td style="width:25%">Harga</td>
+<td style="width:15%">Jumlah</td>
+<td style="width:20%">Subtotal</td>
+</tr>
 
 ';
 
-$sql="SELECT bayar.*,siswa.nis,siswa.nama,siswa.kelas,bayar_metode.metode FROM bayar,siswa,bayar_metode WHERE bayar.dihapus_pada IS NULL AND bayar.id_siswa=siswa.id_siswa AND bayar.id_bayar_metode=bayar_metode.id_bayar_metode AND bayar.tanggal_bayar BETWEEN '$tanggal_awal' AND '$tanggal_akhir' AND bayar.id_siswa=$id_siswa ORDER BY bayar.tanggal_bayar ASC";
+$sql="SELECT detailpenjualan.*,penjualan.TanggalPenjualan,produk.NamaProduk FROM detailpenjualan,penjualan,produk WHERE detailpenjualan.PenjualanID=penjualan.PenjualanID AND detailpenjualan.ProdukID=produk.ProdukID AND TanggalPenjualan BETWEEN '$tanggal_awal' AND '$tanggal_akhir' AND detailpenjualan.ProdukID=$ProdukID ORDER BY produk.NamaProduk ASC";
 $query=mysqli_query($koneksi,$sql);
 $no=0;
-$total=0;
-while($bayar=mysqli_fetch_array($query)){
-  $no++;
-  $total=$total+$bayar['nominal_bayar'];
-  $html.='
-  <tr>
-  <td>'.$no.'</td>
-  <td>'.$bayar['nis'].'</td>
-  <td>'.$bayar['nama'].'</td>
-  <td>'.$bayar['kelas'].'</td>
-  <td>'.$bayar['tanggal_bayar'].'</td>
-  <td>'.$bayar['status_verifikasi'].'</td>
-  <td align="right";>'.number_format($bayar['nominal_bayar']).'</td>
-</tr>
-  ';
+$total_item=0;
+$total_belanja=0;
+while($data=mysqli_fetch_array($query)){
+    $no++;
+    $subtotal=$data['JumlahProduk']*$data['Harga'];
+    $total_item=$total_item+$data['JumlahProduk'];
+    $total_belanja=$total_belanja+$subtotal;
+    $html.='
+    <tr>
+        <td>'.$no.'</td>
+        <td>'.$data['PenjualanID'].'</td>
+        <td>'.$data['TanggalPenjualan'].'</td>
+        <td>'.number_format($data['Harga']).'</td>
+        <td>'.$data['JumlahProduk'].'</td>
+        <td align="right">'.number_format($subtotal).'</td>
+    </tr>
+    ';
 }
+
 $html.='
 <tr>
-  <td colspan="6" align="center"><b>Grantotal</b></td>
-  <td align="right"><b>'.number_format($total).'</b></td>
+    <td colspan="5" align="center"><b>Grandtotal</b></td>
+    <td align="right"><b>'.number_format($total_belanja).'</b></td>
 </tr>
 </table>
-<br><br>
--- Dicetak Pada : '.date("d-F-Y H:i:s").' --
+<br> <br>
+-- Dicetak Pada : '.date('d-F-Y H:i:s').' --
 ';
-
 // output the HTML content
 $pdf->writeHTML($html, true, false, true, false, '');
 
 //Close and output PDF document
-$pdf->Output('laporan_pembayaran_siswa.pdf', 'I');
+$pdf->Output('laporan_penjualan_perproduk.pdf', 'I');
 
 //============================================================+
 // END OF FILE

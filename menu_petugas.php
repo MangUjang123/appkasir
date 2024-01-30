@@ -15,7 +15,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="index.php?p=bayar" class="nav-link">
+            <a href="index.php?p=histori" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Histori</p>
             </a>

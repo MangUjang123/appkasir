@@ -54,13 +54,17 @@
                         <td>
 
                         <!-- Tombol Print Nota -->
-                        <a href="#"><i class="fas fa-print"></i></a>
+                        <a href="pdf/output/nota_jual.php?PenjualanID=<?=$kolom['PenjualanID'];?>" target="_blank">
+                        <i class="fas fa-print"></i></a>
+                        | 
                         <!-- Tombol Informasi -->
                         <a href="index.php?p=infojual&PenjualanID=<?= $kolom
                         ['PenjualanID']; ?>"><i class="fas fa-search"></i></a>
+                        |
                         <!-- Tombol Hapus -->
                         <a href="aksi/penjualan.php?aksi=hapus&PenjualanID=<?= $kolom['PenjualanID']; ?>"
                         onclick="return confirm('Yakin Akan Hapus Data Ini??')"><i class="fas fa-trash"></i></a>
+                        
                             <td>
                     </tr>
                     <!-- MODAL UBAH USER -->
@@ -105,8 +109,12 @@
                 ?>
             </table>
 
-            <button type="button" class="btn bg-info btn-block mt-3" data-toggle="modal" data-target="#modaltambah" ><i class="fas fa-plus"></i>Tambah Produk</button>
-
+            <a href="index.php?p=tambah">
+              <button class="btn btn-info
+              btn-block"><i class="fas
+              fa-plus">Tambah Penjualan
+              Baru</i></button>
+            </a>
         </div>
     </div>
 
